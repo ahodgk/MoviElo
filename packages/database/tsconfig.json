@@ -1,0 +1,14 @@
+{
+  "extends": "@repo/typescript-config/base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "strict": true,
+    "strictNullChecks": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/client.ts",
+    "prisma/schema/generated/**/*.ts"
+  ],
+  "exclude": ["node_modules", "*.cjs", "dist", "__tests__"]
+}

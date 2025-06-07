@@ -1,0 +1,215 @@
+{
+  "id": "bb06506b-e475-4f19-b09e-bd25ea1db75c",
+  "prevId": "25484047-2f36-4932-93d5-a36283d0d619",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.user": {
+      "name": "user",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "is_admin": {
+          "name": "is_admin",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "avatar_url": {
+          "name": "avatar_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "age": {
+          "name": "age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "skin_type": {
+          "name": "skin_type",
+          "type": "skin_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'normal'"
+        },
+        "skin_concerns": {
+          "name": "skin_concerns",
+          "type": "skin_concerns[]",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'"
+        },
+        "skin_goals": {
+          "name": "skin_goals",
+          "type": "skin_goals[]",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'"
+        },
+        "allergies": {
+          "name": "allergies",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{}'"
+        },
+        "current_spend": {
+          "name": "current_spend",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "other_info": {
+          "name": "other_info",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "''"
+        },
+        "avatar": {
+          "name": "avatar",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "user_id_unique": {
+          "name": "user_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.skin_concerns": {
+      "name": "skin_concerns",
+      "schema": "public",
+      "values": [
+        "acne",
+        "wrinkles",
+        "dark_spots",
+        "redness",
+        "dryness",
+        "oily_skin",
+        "sensitivity",
+        "puffiness",
+        "dark_circles",
+        "enlarged_pores",
+        "dullness",
+        "uneven_skin_tone",
+        "blackheads",
+        "whiteheads",
+        "rosacea",
+        "eczema",
+        "psoriasis",
+        "sun_damage",
+        "hyperpigmentation",
+        "melasma",
+        "other"
+      ]
+    },
+    "public.skin_goals": {
+      "name": "skin_goals",
+      "schema": "public",
+      "values": [
+        "hydration",
+        "anti-aging",
+        "acne_control",
+        "brightening",
+        "even_skin_tone",
+        "sensitivity_relief",
+        "pore_minimization",
+        "oil_control",
+        "redness_reduction",
+        "dark_circle_reduction",
+        "puffiness_reduction",
+        "skin_texture_improvement",
+        "dark_spot_correction",
+        "wrinkle_reduction",
+        "skin_tightening",
+        "radiance_boost",
+        "skin_rejuvenation",
+        "skin_smoothing",
+        "skin_nourishment",
+        "skin_clarity",
+        "skin_balancing",
+        "skin_protection",
+        "other"
+      ]
+    },
+    "public.skin_type": {
+      "name": "skin_type",
+      "schema": "public",
+      "values": [
+        "normal",
+        "dry",
+        "oily",
+        "combination",
+        "sensitive"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

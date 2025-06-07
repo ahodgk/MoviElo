@@ -1,0 +1,52 @@
+name: Check NextJs build
+
+on:
+  workflow_call:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+    branches:
+      - '*'
+  push:
+    branches-ignore:
+      - 'main'
+  workflow_dispatch:
+
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable yarn with corepack
+        run: |
+          corepack enable
+          corepack prepare yarn@stable --activate
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+          cache: yarn
+
+    
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build with Next.js
+        run: yarn build

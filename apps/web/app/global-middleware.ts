@@ -1,0 +1,1 @@
+// registerGlobalMiddleware({ middleware: [injectUserMiddleware] });

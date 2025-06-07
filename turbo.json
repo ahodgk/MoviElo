@@ -1,0 +1,73 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": ["**/.env.*local"],
+  "ui": "stream",
+  "globalEnv": [
+    "NODE_ENV",
+    "SENTRY_AUTH_TOKEN",
+    "DATABASE_URL"
+  ],
+  "tasks": {
+    
+
+    "db:migrate:deploy": {
+      "dependsOn": ["^db:migrate:deploy"],
+      "env": ["DATABASE_URL"]
+    },
+    "db:migrate:dev": {
+      "cache": false,
+      "persistent": true,
+      "interactive": true,
+      "env": ["DATABASE_URL"],
+      "dependsOn": ["^db:migrate:generate"]
+    },
+    "db:generate": {
+      "dependsOn": ["^db:generate"],
+      "cache": false,
+      "env": ["DATABASE_URL"]
+    },
+    "db:migrate:reset": {
+      "dependsOn": ["^db:migrate:reset"],
+      "env": ["DATABASE_URL"]
+    },
+ 
+    "db:seed": {
+      "dependsOn": ["^db:seed"],
+      "env": ["DATABASE_URL"]
+    },
+    
+    "test": {
+      "outputs": ["coverage/**"],
+      "dependsOn": [],
+      "env": ["DATABASE_URL"]
+    },
+    "lint": {
+    },
+    "studio": {
+      "dependsOn": ["^db:generate"],
+      "cache": false,
+      "persistent": true
+    },
+
+
+
+    "build": {
+      "outputs": [".output", ".vinxi"],
+      "dependsOn": ["^build", "^db:generate", "lint"],
+      "env": ["NEXT_PUBLIC_API_HOST"]
+    },
+
+    "dev": {
+      "dependsOn": ["^db:generate"],
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "env": ["DATABASE_URL"]
+    },
+
+    "clean": {
+      "cache": false
+    }
+  }
+}

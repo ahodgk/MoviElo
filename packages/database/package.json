@@ -1,0 +1,60 @@
+{
+  "name": "@repo/database",
+  "version": "0.0.0",
+  "exports": {
+    ".": {
+      "default": [
+        "./src/index.ts",
+        "./dist/index.js"
+      ],
+      "types": [
+        "./src/index.ts",
+        "./dist/index.d.ts"
+      ]
+    },
+    "./schema": {},
+    "./zod": {
+      "default": [
+        "./src/zod.ts",
+        "./dist/zod.js"
+      ],
+      "types": [
+        "./src/zod.ts",
+        "./dist/zod.d.ts"
+      ]
+    }
+  },
+  "type": "module",
+  "prisma": {
+    "seed": "tsx src/seed.ts"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "db:pull": "drizzle-kit pull",
+    "db:push": "drizzle-kit push",
+    "migrate": "drizzle-kit migrate",
+    "build": "tsc",
+    "studio": "drizzle-kit studio",
+    "generate": "drizzle-kit generate",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "buffer": "^6.0.3",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.41.0",
+    "drizzle-zod": "^0.7.0",
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@types/node": "^20.11.24",
+    "drizzle-kit": "^0.30.5",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.3",
+    "rimraf": "^5.0.5",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3",
+    "vitest": "^3.0.9",
+    "zod": "^3.24.2"
+  }
+}
