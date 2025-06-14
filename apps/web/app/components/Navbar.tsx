@@ -1,8 +1,8 @@
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
-import { Link, LinkProps, useRouteContext } from "@tanstack/react-router";
+import { Link, type LinkProps, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Clapperboard, Film, Menu, MoonStar, Stars, Sun } from "lucide-react";
-import type { ComponentProps, MouseEventHandler, ReactNode } from "react";
+import { Clapperboard, MoonStar, Sun } from "lucide-react";
+import type { MouseEventHandler, ReactNode } from "react";
 import { useTheme } from "~/components/context/ThemeContext";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -13,6 +13,24 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Switch } from "~/components/ui/switch";
 import { logoutFn } from "~/lib/functions/auth/logout";
+
+const NavButton = ({
+  to,
+  children,
+  className,
+}: {
+  to: LinkProps["to"];
+  children: ReactNode;
+  className?: string;
+}) => {
+  return (
+    <Button variant={"link"} className="p-2" asChild>
+      <Link className={`mx-2 dark:text-white ${className}`} to={to}>
+        {children}
+      </Link>
+    </Button>
+  );
+};
 
 export function Navbar() {
   // const { session, user, logout } = useSession();
@@ -25,24 +43,6 @@ export function Navbar() {
 
   const isLoggedIn = !!user; //!!session;
 
-  const NavButton = ({
-    to,
-    children,
-    className,
-  }: {
-    to: LinkProps["to"];
-    children: ReactNode;
-    className?: string;
-  }) => {
-    return (
-      <Button variant={"link"} className="p-2" asChild>
-        <Link className={`mx-2 dark:text-white ${className}`} to={to}>
-          {children}
-        </Link>
-      </Button>
-    );
-  };
-
   const handleLogout: MouseEventHandler = async (e) => {
     e.preventDefault();
     await logout();
@@ -51,7 +51,6 @@ export function Navbar() {
   };
 
   return (
-
     <nav
       key={isLoggedIn ? 1 : 0}
       className="box-border w-full shadow-xs border-b-2 p-4 flex flex-row justify-between items-center"
@@ -65,8 +64,10 @@ export function Navbar() {
       </div>
 
       <div>
-        <NavButton className="" to={'/lists'}>Lists</NavButton>
-        </div>
+        <NavButton className="" to={"/lists"}>
+          Lists
+        </NavButton>
+      </div>
 
       <div className="flex flex-row">
         {!isLoggedIn && (

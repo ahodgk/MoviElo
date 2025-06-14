@@ -1,4 +1,3 @@
-import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getSupabaseServerClient } from "~/utils/supabase";

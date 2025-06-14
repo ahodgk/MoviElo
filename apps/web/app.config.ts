@@ -1,8 +1,5 @@
-import { resolve } from "node:path";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "@tanstack/react-start/config";
-import browserslist from "browserslist";
-import { browserslistToTargets } from "lightningcss";
 // todo catch errs and pino log them
 // const vite_logger = createLogger();
 // vite_logger.info = logger.info;

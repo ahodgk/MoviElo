@@ -2,7 +2,6 @@
 
 import type { userProfile } from "@repo/database";
 import { createFileRoute } from "@tanstack/react-router";
-import { P } from "pino";
 import {
   Card,
   CardContent,
@@ -50,8 +49,8 @@ export default function ProfileSetupPage() {
   );
 }
 
-import { defineStepper } from "~/components/ui/stepper";
 import { z } from "zod";
+import { defineStepper } from "~/components/ui/stepper";
 
 const { Stepper } = defineStepper(
   { id: "step-1", title: "Step 1" },
@@ -64,7 +63,7 @@ const formSchema = z.object({
   last_name: z.string(),
   age: z.number().min(18, "You must be at least 18 years old"),
   skin_type: z.enum(["oily", "dry", "combination", "normal"]),
-})
+});
 
 const ProfileSetupSteps = ({ step }: { step: number }) => {
   return (

@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 // import { Card, CardContent, CardHeader } from "@/components/shadcn/card";
 
-
 export const Route = createFileRoute("/")({
   component: Home,
 

@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { fetch } from "~/lib/fetch-cache";
-import { logger } from "~/lib/logger";
 import { protectMiddleware } from "~/lib/middleware/auth";
 import type { MovieDetails } from "./_types";
 

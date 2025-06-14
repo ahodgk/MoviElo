@@ -9,8 +9,6 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-
-
 const timestamps = {
   updatedAt: timestamp()
     .defaultNow()
@@ -45,7 +43,7 @@ export const movieList = pgTable("movie_list", {
       onUpdate: "cascade",
     }),
 
-  initialK: integer().default(10).notNull(), // how quickly elo changes, 
+  initialK: integer().default(10).notNull(), // how quickly elo changes,
   tuningFactor: integer().default(10).notNull(), // how quick k decreases, ie 5 would mean after 5 runs k halves
 
   ...timestamps,
@@ -72,7 +70,7 @@ export const movieListItem = pgTable(
     primaryKey({
       columns: [table.tmdbId, table.movieListId],
     }),
-  ]
+  ],
 );
 
 export const movieListComparisonHistory = pgTable(
@@ -105,7 +103,5 @@ export const movieListComparisonHistory = pgTable(
     })
       .onDelete("cascade")
       .onUpdate("cascade"),
-  ]
+  ],
 );
-
-

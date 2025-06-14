@@ -17,7 +17,7 @@ interface ThemeContextProps {
   toggleTheme: () => void;
 }
 
-export const getThemeCookieFn = createServerFn().handler(async (req) => {
+export const getThemeCookieFn = createServerFn().handler(async (_req) => {
   return getCookie("theme");
 });
 
@@ -29,7 +29,6 @@ export const setThemeCookieFn = createServerFn()
     return theme;
   })
   .handler(async (req) => {
-    console.log("set theme cookie");
     const theme = req.data;
     setCookie("theme", theme);
   });

@@ -111,8 +111,7 @@ export const useAddItemToListMutation = () => {
   });
 };
 
-
-export const useResetListMutation = ()=>{
+export const useResetListMutation = () => {
   const queryClient = useQueryClient();
   const resetElo = useServerFn(resetEloFn);
 
@@ -138,4 +137,4 @@ export const useResetListMutation = ()=>{
       });
     },
   });
-}
+};

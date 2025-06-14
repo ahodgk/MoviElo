@@ -38,7 +38,7 @@ export const movieListItemRelations = relations(
       fields: [movieListItem.userId],
       references: [userProfile.id],
     }),
-  })
+  }),
 );
 
 export const movieListComparisonHistoryRelations = relations(
@@ -64,5 +64,5 @@ export const movieListComparisonHistoryRelations = relations(
       references: [movieListItem.movieListId, movieListItem.tmdbId],
       relationName: "losingItem",
     }),
-  })
+  }),
 );

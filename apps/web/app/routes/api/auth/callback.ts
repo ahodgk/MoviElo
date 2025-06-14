@@ -1,6 +1,4 @@
 import { eq, userProfile } from "@repo/database";
-import { redirect } from "@tanstack/react-router";
-import { json } from "@tanstack/react-start";
 import { createAPIFileRoute } from "@tanstack/react-start/api";
 import { db } from "~/lib/db";
 import { getSupabaseServerClient } from "~/utils/supabase";

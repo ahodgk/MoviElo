@@ -130,7 +130,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html className={`${theme}`} lang="en">
       <head suppressHydrationWarning>
         <HeadContent />
-        <CookieBotScript />
+        {/* <CookieBotScript /> */}
       </head>
       <body>
         <PostHogProvider>
@@ -155,18 +155,18 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function CookieBotScript() {
-  return (
-    <script
-      id="Cookiebot"
-      src="https://consent.cookiebot.com/uc.js"
-      data-cbid="7a83f6d4-ce19-4c27-b1d3-23d00eb3eed3"
-      data-blockingmode="auto"
-      type="text/javascript"
-      async
-    />
-  );
-}
+// export default function CookieBotScript() {
+//   return (
+//     <script
+//       id="Cookiebot"
+//       src="https://consent.cookiebot.com/uc.js"
+//       data-cbid="7a83f6d4-ce19-4c27-b1d3-23d00eb3eed3"
+//       data-blockingmode="auto"
+//       type="text/javascript"
+//       async
+//     />
+//   );
+// }
 
 declare global {
   interface Window {

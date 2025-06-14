@@ -1,7 +1,7 @@
 "use client";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,9 +9,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import { resetPasswordFn } from "~/lib/functions/auth/reset-password";
 
 export const Route = createFileRoute("/_auth/reset-password")({
@@ -37,7 +37,7 @@ function ResetPasswordPage() {
               Email address:
               <Input
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e: any) => setEmail(e.target.value)}
                 placeholder={"email@example.com"}
               />
             </Label>

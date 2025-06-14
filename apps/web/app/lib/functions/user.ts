@@ -1,4 +1,4 @@
-import { eq, movieList, userProfile } from "@repo/database";
+import { eq, userProfile } from "@repo/database";
 import { createUpdateSchema } from "@repo/database/zod";
 import { createServerFn } from "@tanstack/react-start";
 import { getSupabaseServerClient } from "~/utils/supabase";
@@ -48,7 +48,7 @@ export const setUserProfileFn = createServerFn({ method: "POST" })
 
       firstName: true,
       lastName: true,
-    })
+    }),
   )
   .handler(async ({ data, context }) => {
     const { user } = context;

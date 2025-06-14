@@ -1,9 +1,8 @@
 // import { useAuthContext } from "@/components/context/AuthContext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "@tanstack/react-router";
 // import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { AiFillGoogleCircle, AiOutlineGoogle } from "react-icons/ai";
+import { AiOutlineGoogle } from "react-icons/ai";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {

@@ -1,13 +1,8 @@
 // app/providers.tsx
 
-import {
-  useLocation,
-  useRouteContext,
-  useSearch,
-} from "@tanstack/react-router";
+import { useLocation, useRouteContext } from "@tanstack/react-router";
 import posthog from "posthog-js";
-import { usePostHog } from "posthog-js/react";
-import { PostHogProvider as PHProvider } from "posthog-js/react";
+import { PostHogProvider as PHProvider, usePostHog } from "posthog-js/react";
 import { Suspense, useEffect, useState } from "react";
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
@@ -84,7 +79,7 @@ export function usePageTracking() {
   const posthog = usePostHog();
   const [prevPathname, setPrevPathname] = useState<string | null>(null);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reason
   useEffect(() => {
     if (prevPathname && prevPathname !== pathname) {
       posthog.capture("$pageleave", { $pathname: prevPathname });

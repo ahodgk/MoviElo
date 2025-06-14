@@ -1,5 +1,4 @@
 import { userProfile } from "@repo/database";
-import { createInsertSchema } from "@repo/database/zod";
 import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getHeaders } from "@tanstack/react-start/server";
@@ -50,7 +49,7 @@ export const signupFn = createServerFn({ method: "POST" })
   });
 
 export const signupWithGoogleFn = createServerFn({ method: "POST" }).handler(
-  async ({ data }) => {
+  async ({ _data }) => {
     const supabase = getSupabaseServerClient();
     const headers = getHeaders();
     const host = headers.host;
