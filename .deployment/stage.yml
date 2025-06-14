@@ -1,0 +1,18 @@
+name: movielo-stage
+services:
+  server:
+    container_name: movielo-stage
+    image: 'docker.adamhodgkinson.dev/movielo:DEV'
+    depends_on:
+      - postgresql
+    restart: unless-stopped
+    env_file: 'stage.env'
+    # environment:
+    #   - DATABASE_URL=postgresql://flixxr:password@postgresql:5432/flixxr_db
+    #   - PORT=3007
+    #   - APP_URL=https://beta.flixxr.xyz
+    #   - LOKI_SERVICE_NAME=flixxr-beta
+    ports:
+      - "3013:3007"
+    networks:
+      - movielo-network

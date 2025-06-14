@@ -1,0 +1,15 @@
+name: movielo-prod
+services:
+  server:
+    container_name: movielo-prod
+    image: 'docker.adamhodgkinson.dev/movielo:PROD'
+    depends_on:
+      - postgresql
+    restart: unless-stopped
+    env_file: 'prod.env'
+    # environment:
+    #   - DATABASE_URL=postgresql://flixxr:password@postgresql:5432/flixxr_db
+    #   - PORT=3007
+    #   - APP_URL=https://flixxr.xyz
+    ports:
+      - "3012:3007"
