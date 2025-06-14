@@ -1,0 +1,75 @@
+#file: noinspection SpellCheckingInspection
+name: deploy
+on:
+  workflow_call:
+    inputs:
+      SSH_USER:
+        required: true
+        type: string
+        description: 'The SSH User to deploy as'
+      environment:
+        required: true
+        type: string
+        description: 'The environment to deploy to'
+      DOCKERHUB_USERNAME:
+        required: true
+        type: string
+        description: 'The Dockerhub Username'
+      IMAGE:
+        required: true
+        type: string
+        description: 'The image name to deploy'
+    secrets:
+      SSH_KEY:
+        required: true
+        description: 'The SSH Key to use for deployment'
+
+      DOCKERHUB_TOKEN:
+        required: true
+        description: 'The Dockerhub Token'
+
+jobs:
+  deploy:
+    concurrency:
+      group: deploy-${{inputs.environment}}
+      cancel-in-progress: true
+    environment:
+      name: ${{inputs.environment}}
+      # url: ${{ inputs.environment == 'production' && 'https://flixxr.xyz' || 'https://beta.flixxr.xyz'}}
+    env:
+      compose: ${{ inputs.environment == 'production' && 'prod' || 'stage'}}
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: SCP Command to Transfer Files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{  vars.SSH_HOST }}
+          username: ${{inputs.SSH_USER}}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          source: .deployment/${{ env.compose }}.yml
+          target: ~/containers/${{inputs.IMAGE}}
+
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ vars.SSH_HOST }}
+          port: 22
+          username: ${{inputs.SSH_USER}}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            echo 'deploying' &&
+            cd ~/containers/${{inputs.IMAGE}} &&
+            mv .deployment/${{env.compose}}.yml ./${{env.compose}}.yml &&
+            rm -rf .deployment &&
+
+            echo 'pulling images'
+            docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }} docker.adamhodgkinson.dev &&
+            docker compose -f ./${{env.compose}}.yml pull &&
+            docker compose -f ./${{env.compose}}.yml down &&
+            docker compose -f ./${{env.compose}}.yml up -d
+  # purge:
+  #   needs: deploy
+  #   uses: ./.github/workflows/purge-cache.yml
+  #   secrets: inherit

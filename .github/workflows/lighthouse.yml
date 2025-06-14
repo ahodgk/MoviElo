@@ -1,0 +1,78 @@
+name: Lighthouse
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  lighthouse:
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+    name: LightHouse CI
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/sipsync_db
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Set .env file
+        run: echo ${{env.DATABASE_URL}} > .env && export DATABASE_URL=${{env.DATABASE_URL}} && echo $DATABASE_URL
+
+      - name: Build
+        run: pnpm build
+
+      - name: Create database
+        env:
+          DATABASE_URL: ${{env.DATABASE_URL}}
+        run: pnpm db:migrate:deploy
+
+      - name: run Lighthouse CI
+        env:
+          DATABASE_URL: ${{env.DATABASE_URL}}
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+        run: |
+          pnpm install -g @lhci/cli@0.14.x
+          lhci autorun

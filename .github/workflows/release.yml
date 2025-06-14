@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment_chosen:
+        required: false
+        type: environment
+        description: 'The environment to deploy to'
+  release:
+    types:
+      - released
+      - prereleased
+      - edited
+    branches:
+      - main
+
+env:
+  IMAGE: "movielo"
+  ENVIRONMENT: ${{ inputs.environment_chosen || (github.event.release.prerelease == false && !contains(github.ref_name, '-')) && 'production' || 'staging' }}
+jobs:
+
+  checks:
+    secrets: inherit
+    uses: ./.github/workflows/checks.yml
+
+  build:
+    secrets: inherit
+    needs: checks
+    with:
+      IMAGE: "movielo"
+      version_name: ${{ github.ref_name }}
+    uses: ./.github/workflows/build.yml
+
+  retag:
+    if: ${{ ((github.event.release.prerelease == false && !contains(github.ref_name, '-')) && (inputs.environment_chosen == 'production' || inputs.environment_chosen == null))  }}
+    needs:
+    - build
+    - checks
+    runs-on: self-hosted
+    steps:
+      - name: docker login
+        env:
+          DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKER_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USERNAME --password-stdin docker.adamhodgkinson.dev
+      - name: docker pull
+        run: docker pull docker.adamhodgkinson.dev/${{env.IMAGE}}:${{ github.sha }}
+      - name: tag
+        run: |
+          docker tag docker.adamhodgkinson.dev/${{env.IMAGE}}:${{ github.sha }} docker.adamhodgkinson.dev/${{env.IMAGE}}:PROD
+          docker tag docker.adamhodgkinson.dev/${{env.IMAGE}}:${{ github.sha }} docker.adamhodgkinson.dev/${{env.IMAGE}}:${{ github.ref_name }}
+          docker tag docker.adamhodgkinson.dev/${{env.IMAGE}}:${{ github.sha }} ghcr.io/ahodgk/${{env.IMAGE}}:PROD
+          docker tag docker.adamhodgkinson.dev/${{env.IMAGE}}:${{ github.sha }} ghcr.io/ahodgk/${{env.IMAGE}}:${{ github.ref_name }}
+
+      - name: docker push
+        run: docker push docker.adamhodgkinson.dev/${{env.IMAGE}} --all-tags
+
+
+  deploy:
+#   ensures it still runs when previous step does not
+    if: always() && needs.build.result == 'success'
+    needs:
+      - build
+      - checks
+      - retag
+    uses: ./.github/workflows/deploy.yml
+    with:
+      IMAGE: "movielo"
+      environment: ${{ ((github.event.release.prerelease == false && !contains(github.ref_name, '-')) && (inputs.environment_chosen == 'production' || inputs.environment_chosen == null)) && 'production' || 'staging' }}
+      SSH_USER: movielo
+      DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+    secrets: inherit
+
+
+
