@@ -22,6 +22,20 @@
       "when": 1749915804508,
       "tag": "0002_organic_zarek",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1749937147003,
+      "tag": "0003_rare_sauron",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1749938979951,
+      "tag": "0004_romantic_vivisector",
+      "breakpoints": true
     }
   ]
 }

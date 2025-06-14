@@ -1,0 +1,2 @@
+ALTER TABLE "movie_list_comparison_history" ADD COLUMN "elo_gain" integer DEFAULT 0 NOT NULL;--> statement-breakpoint
+ALTER TABLE "movie_list_comparison_history" ADD COLUMN "elo_loss" integer DEFAULT 0 NOT NULL;

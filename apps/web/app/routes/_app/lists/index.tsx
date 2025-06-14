@@ -1,6 +1,6 @@
 import type { movieList } from "@repo/database";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { Suspense } from "react";
 import { Button } from "~/components/ui/button";
@@ -82,12 +82,19 @@ const ListsDisplay = ({ lists }: { lists: MovieList[] }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {lists.map((list) => (
-        <Card key={list.id}>
-          <CardHeader>
-            <CardTitle>{list.name}</CardTitle>
-          </CardHeader>
-          <CardContent>{list.description}</CardContent>
-        </Card>
+        <Link
+          key={list.id}
+          className="p-0 hover:-translate-y-2 transition-all ease-in-out"
+          to={"/lists/$listId"}
+          params={{ listId: list.id }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>{list.name}</CardTitle>
+            </CardHeader>
+            <CardContent>{list.description}</CardContent>
+          </Card>
+        </Link>
       ))}
     </div>
   );

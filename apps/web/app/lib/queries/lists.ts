@@ -7,6 +7,7 @@ import {
 import { useServerFn } from "@tanstack/react-start";
 import toast from "react-hot-toast";
 import {
+  getComparisonHistoryFn,
   getListDetails,
   getListItemsFn,
   getLists,
@@ -138,3 +139,9 @@ export const useResetListMutation = () => {
     },
   });
 };
+
+export const getListComparisonHistoryQueryOptions = (listId: string) =>
+  queryOptions({
+    queryKey: ["list", listId, "history"],
+    queryFn: () => getComparisonHistoryFn({ data: { listId } }),
+  });

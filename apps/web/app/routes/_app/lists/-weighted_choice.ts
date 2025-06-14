@@ -78,7 +78,7 @@ const eloDistanceWeight =
 export function selectTwoRandomItems(
   list: Item[],
   alpha = 1.2, // strength of the “count” penalty
-  sigma = 1000, // how tight you want the ELO pairing
+  sigma = 400, // how tight you want the ELO pairing
 ): [Item, Item] {
   // -------------------- first pick (old logic) ---------------------
   const first = weightedRandomSelect(list, countWeight(alpha));

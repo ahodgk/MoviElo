@@ -19,13 +19,22 @@ export const compareMovieFn = createServerFn()
     z.object({
       winningMovieListItemId: z.string(),
       losingMovieListItemId: z.string(),
-
+      winFirst: z.boolean().optional(),
       movieListId: z.string(),
     }),
   )
   .handler(async ({ context, data }) => {
     logger.debug(
       `Comparing movies: ${data.winningMovieListItemId} vs ${data.losingMovieListItemId}`,
+    );
+
+    const winningMovieItemPromise = getItemEloData(
+      data.movieListId,
+      data.winningMovieListItemId,
+    );
+    const losingMovieItemPromise = getItemEloData(
+      data.movieListId,
+      data.losingMovieListItemId,
     );
 
     // check user can access list
@@ -40,14 +49,9 @@ export const compareMovieFn = createServerFn()
     }
     logger.debug("valid list");
 
-    const winningMovieItem = await getItemEloData(
-      data.movieListId,
-      data.winningMovieListItemId,
-    );
-    const losingMovieItem = await getItemEloData(
-      data.movieListId,
-      data.losingMovieListItemId,
-    );
+    const winningMovieItem = await winningMovieItemPromise;
+    const losingMovieItem = await losingMovieItemPromise;
+
     logger.debug("get list item data");
 
     if (winningMovieItem.length === 0 || losingMovieItem.length === 0) {
@@ -80,15 +84,30 @@ export const compareMovieFn = createServerFn()
     );
 
     // add to history
-    await db.insert(movieListComparisonHistory).values({
+    const dbinsert = db.insert(movieListComparisonHistory).values({
       movieListId: data.movieListId,
       winningMovieListItemId: data.winningMovieListItemId,
       losingMovieListItemId: data.losingMovieListItemId,
+      winFirst: data.winFirst,
+      eloGain: Math.round(winnerElo - winningMovieItem[0].elo),
+      eloLoss: -Math.round(loserElo - losingMovieItem[0].elo),
     });
 
     // update elo
-    await updateElo(data.winningMovieListItemId, data.movieListId, winnerElo);
-    await updateElo(data.losingMovieListItemId, data.movieListId, loserElo);
+    const elo1 = updateElo(
+      data.winningMovieListItemId,
+      data.movieListId,
+      winnerElo,
+    );
+    const elo2 = updateElo(
+      data.losingMovieListItemId,
+      data.movieListId,
+      loserElo,
+    );
+
+    await elo1;
+    await elo2;
+    await dbinsert;
   });
 
 const updateElo = (tmdbId: string, listId: string, elo: number) => {

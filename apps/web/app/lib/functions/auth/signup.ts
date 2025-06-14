@@ -49,7 +49,7 @@ export const signupFn = createServerFn({ method: "POST" })
   });
 
 export const signupWithGoogleFn = createServerFn({ method: "POST" }).handler(
-  async ({ _data }) => {
+  async ({ data }) => {
     const supabase = getSupabaseServerClient();
     const headers = getHeaders();
     const host = headers.host;

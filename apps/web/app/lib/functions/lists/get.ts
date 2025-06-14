@@ -92,3 +92,25 @@ export const getListItemsFn = createServerFn()
 
     return items;
   });
+
+export const getComparisonHistoryFn = createServerFn()
+  .middleware([protectMiddleware])
+  .validator(z.object({ listId: z.string() }))
+  .handler(async ({ context, data }) => {
+    const history = await db
+      .select()
+      .from(movieListComparisonHistory)
+      .leftJoin(
+        movieList,
+        eq(movieList.id, movieListComparisonHistory.movieListId),
+      )
+      .where(
+        and(
+          eq(movieListComparisonHistory.movieListId, data.listId),
+          eq(movieList.userId, context.user.id),
+        ),
+      )
+      .orderBy(desc(movieListComparisonHistory.createdAt));
+
+    return history.map((item) => item.movie_list_comparison_history);
+  });

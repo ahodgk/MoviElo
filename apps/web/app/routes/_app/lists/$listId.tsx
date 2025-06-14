@@ -1,9 +1,20 @@
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
-import type { movieList, movieListItem } from "@repo/database";
+import type {
+  movieList,
+  movieListComparisonHistory,
+  movieListItem,
+} from "@repo/database";
 import { useThrottledValue } from "@tanstack/react-pacer";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Hash, ListPlus, PenBox, Search } from "lucide-react";
+import {
+  ArrowBigDown,
+  ArrowBigUp,
+  Hash,
+  ListPlus,
+  PenBox,
+  Search,
+} from "lucide-react";
 import { Suspense, useCallback, useState } from "react";
 import short from "short-uuid";
 import {
@@ -33,6 +44,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Tooltip, TooltipContent } from "~/components/ui/tooltip";
 import { useCompareMoviesMutation } from "~/lib/queries/comparison";
 import {
+  getListComparisonHistoryQueryOptions,
   getListDetailsQueryOptions,
   getListItemsQueryOptions,
   useAddItemToListMutation,
@@ -132,10 +144,15 @@ function RouteComponent() {
               <TabsContent value="items" className="w-full">
                 <AddMovieSection listId={listId} />
               </TabsContent>
-              <TabsContent value="comparison" className="w-full">
+              <TabsContent
+                value="comparison"
+                className="w-full flex flex-col gap-6"
+              >
                 <Suspense fallback={<div>Loading comparison...</div>}>
                   <ComparisonSection listId={listId} />
                 </Suspense>
+
+                <MovieComparisonHistoryCard listId={listId} />
               </TabsContent>
             </div>
             <div className="grow-[1] mt-2">
@@ -147,6 +164,73 @@ function RouteComponent() {
     </div>
   );
 }
+
+const MovieComparisonHistoryCard = ({ listId }: { listId: string }) => {
+  const { data } = useQuery(getListComparisonHistoryQueryOptions(listId));
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>History</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col gap-4">
+          {data?.map((item) => {
+            return (
+              <div
+                key={item.id}
+                className="flex flex-row items-center justify-center gap-2"
+              >
+                <HistoryMovieCard win={item.winFirst ?? false} item={item} />
+                <span>vs</span>
+                <HistoryMovieCard item={item} win={!item.winFirst} />
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+type MovieListComparisonHistory =
+  typeof movieListComparisonHistory.$inferSelect;
+
+const HistoryMovieCard = ({
+  item,
+  win,
+}: {
+  item: MovieListComparisonHistory;
+  win: boolean;
+}) => {
+  const { data } = useQuery(
+    getMovieDetailsQueryOptions(
+      win ? item.winningMovieListItemId : item.losingMovieListItemId,
+    ),
+  );
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <img
+        alt={`Poster for ${data?.title}`}
+        className="w-24"
+        src={`https://image.tmdb.org/t/p/w200${data?.poster_path}`}
+      />
+      <span>
+        {win ? (
+          <>
+            <ArrowBigUp className="text-green-600" /> +{" "}
+          </>
+        ) : (
+          <>
+            <ArrowBigDown className="text-red-600" /> -{" "}
+          </>
+        )}{" "}
+        {win ? item.eloGain : item.eloLoss}
+      </span>
+    </div>
+  );
+};
+
 type MovieList = typeof movieList.$inferSelect;
 type MovieListWithItems = MovieList & {
   items: MovieListItem[];
@@ -230,6 +314,7 @@ const ComparisonSection = ({ listId }: { listId: string }) => {
                     movieListId: listId,
                     winningMovieListItemId: currentComparison.firstItemId,
                     losingMovieListItemId: currentComparison.secondItemId,
+                    winFirst: true,
                   },
                 });
               }}
@@ -244,6 +329,7 @@ const ComparisonSection = ({ listId }: { listId: string }) => {
                     movieListId: listId,
                     winningMovieListItemId: currentComparison.secondItemId,
                     losingMovieListItemId: currentComparison.firstItemId,
+                    winFirst: false,
                   },
                 });
               }}
