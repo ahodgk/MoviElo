@@ -1,9 +1,269 @@
 {
-  "id": "bb06506b-e475-4f19-b09e-bd25ea1db75c",
-  "prevId": "25484047-2f36-4932-93d5-a36283d0d619",
+  "id": "6941987e-b17c-4be6-bd9e-4956ea596a0a",
+  "prevId": "4842a972-a751-4a22-a6be-597bac823439",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.movie_list": {
+      "name": "movie_list",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "initial_k": {
+          "name": "initial_k",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1500
+        },
+        "tuning_factor": {
+          "name": "tuning_factor",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 32
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "movie_list_user_id_user_id_fk": {
+          "name": "movie_list_user_id_user_id_fk",
+          "tableFrom": "movie_list",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "movie_list_id_unique": {
+          "name": "movie_list_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.movie_list_comparison_history": {
+      "name": "movie_list_comparison_history",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "movie_list_id": {
+          "name": "movie_list_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "winning_movie_list_item_id": {
+          "name": "winning_movie_list_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "losing_movie_list_item_id": {
+          "name": "losing_movie_list_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "movie_list_comparison_history_movie_list_id_movie_list_id_fk": {
+          "name": "movie_list_comparison_history_movie_list_id_movie_list_id_fk",
+          "tableFrom": "movie_list_comparison_history",
+          "tableTo": "movie_list",
+          "columnsFrom": [
+            "movie_list_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "movie_list_comparison_history_movie_list_id_winning_movie_list_item_id_movie_list_item_movie_list_id_tmbd_id_fk": {
+          "name": "movie_list_comparison_history_movie_list_id_winning_movie_list_item_id_movie_list_item_movie_list_id_tmbd_id_fk",
+          "tableFrom": "movie_list_comparison_history",
+          "tableTo": "movie_list_item",
+          "columnsFrom": [
+            "movie_list_id",
+            "winning_movie_list_item_id"
+          ],
+          "columnsTo": [
+            "movie_list_id",
+            "tmbd_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "movie_list_comparison_history_movie_list_id_losing_movie_list_item_id_movie_list_item_movie_list_id_tmbd_id_fk": {
+          "name": "movie_list_comparison_history_movie_list_id_losing_movie_list_item_id_movie_list_item_movie_list_id_tmbd_id_fk",
+          "tableFrom": "movie_list_comparison_history",
+          "tableTo": "movie_list_item",
+          "columnsFrom": [
+            "movie_list_id",
+            "losing_movie_list_item_id"
+          ],
+          "columnsTo": [
+            "movie_list_id",
+            "tmbd_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "movie_list_comparison_history_id_unique": {
+          "name": "movie_list_comparison_history_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.movie_list_item": {
+      "name": "movie_list_item",
+      "schema": "",
+      "columns": {
+        "tmbd_id": {
+          "name": "tmbd_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "movie_list_id": {
+          "name": "movie_list_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "current_elo": {
+          "name": "current_elo",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1500
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "movie_list_item_movie_list_id_movie_list_id_fk": {
+          "name": "movie_list_item_movie_list_id_movie_list_id_fk",
+          "tableFrom": "movie_list_item",
+          "tableTo": "movie_list",
+          "columnsFrom": [
+            "movie_list_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "movie_list_item_tmbd_id_movie_list_id_pk": {
+          "name": "movie_list_item_tmbd_id_movie_list_id_pk",
+          "columns": [
+            "tmbd_id",
+            "movie_list_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.user": {
       "name": "user",
       "schema": "",
@@ -40,55 +300,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "age": {
-          "name": "age",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "skin_type": {
-          "name": "skin_type",
-          "type": "skin_type",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'normal'"
-        },
-        "skin_concerns": {
-          "name": "skin_concerns",
-          "type": "skin_concerns[]",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{}'"
-        },
-        "skin_goals": {
-          "name": "skin_goals",
-          "type": "skin_goals[]",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{}'"
-        },
-        "allergies": {
-          "name": "allergies",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'{}'"
-        },
-        "current_spend": {
-          "name": "current_spend",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "other_info": {
-          "name": "other_info",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "''"
-        },
         "avatar": {
           "name": "avatar",
           "type": "text",
@@ -108,12 +319,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {},
@@ -133,75 +338,7 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {
-    "public.skin_concerns": {
-      "name": "skin_concerns",
-      "schema": "public",
-      "values": [
-        "acne",
-        "wrinkles",
-        "dark_spots",
-        "redness",
-        "dryness",
-        "oily_skin",
-        "sensitivity",
-        "puffiness",
-        "dark_circles",
-        "enlarged_pores",
-        "dullness",
-        "uneven_skin_tone",
-        "blackheads",
-        "whiteheads",
-        "rosacea",
-        "eczema",
-        "psoriasis",
-        "sun_damage",
-        "hyperpigmentation",
-        "melasma",
-        "other"
-      ]
-    },
-    "public.skin_goals": {
-      "name": "skin_goals",
-      "schema": "public",
-      "values": [
-        "hydration",
-        "anti-aging",
-        "acne_control",
-        "brightening",
-        "even_skin_tone",
-        "sensitivity_relief",
-        "pore_minimization",
-        "oil_control",
-        "redness_reduction",
-        "dark_circle_reduction",
-        "puffiness_reduction",
-        "skin_texture_improvement",
-        "dark_spot_correction",
-        "wrinkle_reduction",
-        "skin_tightening",
-        "radiance_boost",
-        "skin_rejuvenation",
-        "skin_smoothing",
-        "skin_nourishment",
-        "skin_clarity",
-        "skin_balancing",
-        "skin_protection",
-        "other"
-      ]
-    },
-    "public.skin_type": {
-      "name": "skin_type",
-      "schema": "public",
-      "values": [
-        "normal",
-        "dry",
-        "oily",
-        "combination",
-        "sensitive"
-      ]
-    }
-  },
+  "enums": {},
   "schemas": {},
   "sequences": {},
   "roles": {},

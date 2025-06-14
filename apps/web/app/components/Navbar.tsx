@@ -1,8 +1,8 @@
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
-import { Link, useRouteContext } from "@tanstack/react-router";
+import { Link, LinkProps, useRouteContext } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Menu, MoonStar, Stars, Sun } from "lucide-react";
-import type { MouseEventHandler, ReactNode } from "react";
+import { Clapperboard, Film, Menu, MoonStar, Stars, Sun } from "lucide-react";
+import type { ComponentProps, MouseEventHandler, ReactNode } from "react";
 import { useTheme } from "~/components/context/ThemeContext";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -26,20 +26,20 @@ export function Navbar() {
   const isLoggedIn = !!user; //!!session;
 
   const NavButton = ({
-    href,
+    to,
     children,
     className,
   }: {
-    href?: string;
+    to: LinkProps["to"];
     children: ReactNode;
     className?: string;
   }) => {
     return (
-      <>
-        <Link className={`mx-2 dark:text-white ${className}`} to={href || ""}>
+      <Button variant={"link"} className="p-2" asChild>
+        <Link className={`mx-2 dark:text-white ${className}`} to={to}>
           {children}
         </Link>
-      </>
+      </Button>
     );
   };
 
@@ -60,19 +60,23 @@ export function Navbar() {
         {/* <Button variant="ghost" className="mr-2 p-2">
           <Menu className="size-6" />
         </Button> */}
-        <Stars className=" size-5 mr-2" />
-        Skincare Genie
+        <Clapperboard className="size-6 mr-2" />
+        MoviElo
       </div>
+
+      <div>
+        <NavButton className="" to={'/lists'}>Lists</NavButton>
+        </div>
 
       <div className="flex flex-row">
         {!isLoggedIn && (
-          <NavButton className="" href="/register">
+          <NavButton className="" to="/register">
             Signup
           </NavButton>
         )}
 
         {!isLoggedIn && (
-          <NavButton className="" href="/login">
+          <NavButton className="" to="/login">
             Login
           </NavButton>
         )}

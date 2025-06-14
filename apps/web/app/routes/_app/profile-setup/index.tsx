@@ -50,7 +50,7 @@ export default function ProfileSetupPage() {
   );
 }
 
-import { defineStepper } from "@/components/ui/stepper";
+import { defineStepper } from "~/components/ui/stepper";
 import { z } from "zod";
 
 const { Stepper } = defineStepper(

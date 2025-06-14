@@ -5,7 +5,7 @@ import { useState } from "react";
 //   AlertDialog,
 //   type AlertDialogState,
 // } from "@/components/custom/AlertDialog";
-import { Button } from "@/components/ui/button";
+import { Button } from "~/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,

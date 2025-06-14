@@ -1,7 +1,3 @@
-import {
-  drizzle as _drizzle,
-  type PostgresJsDatabase,
-} from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
 import "dotenv/config";

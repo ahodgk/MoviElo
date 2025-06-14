@@ -1,9 +1,269 @@
 {
-  "id": "25484047-2f36-4932-93d5-a36283d0d619",
+  "id": "4842a972-a751-4a22-a6be-597bac823439",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.movie_list": {
+      "name": "movie_list",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "initial_k": {
+          "name": "initial_k",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1500
+        },
+        "tuning_factor": {
+          "name": "tuning_factor",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 32
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "movie_list_user_id_user_id_fk": {
+          "name": "movie_list_user_id_user_id_fk",
+          "tableFrom": "movie_list",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "movie_list_id_unique": {
+          "name": "movie_list_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.movie_list_comparison_history": {
+      "name": "movie_list_comparison_history",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "movie_list_id": {
+          "name": "movie_list_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "winning_movie_list_item_id": {
+          "name": "winning_movie_list_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "losing_movie_list_item_id": {
+          "name": "losing_movie_list_item_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "movie_list_comparison_history_movie_list_id_movie_list_id_fk": {
+          "name": "movie_list_comparison_history_movie_list_id_movie_list_id_fk",
+          "tableFrom": "movie_list_comparison_history",
+          "tableTo": "movie_list",
+          "columnsFrom": [
+            "movie_list_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "movie_list_comparison_history_movie_list_id_winning_movie_list_item_id_movie_list_item_movie_list_id_tmbd_id_fk": {
+          "name": "movie_list_comparison_history_movie_list_id_winning_movie_list_item_id_movie_list_item_movie_list_id_tmbd_id_fk",
+          "tableFrom": "movie_list_comparison_history",
+          "tableTo": "movie_list_item",
+          "columnsFrom": [
+            "movie_list_id",
+            "winning_movie_list_item_id"
+          ],
+          "columnsTo": [
+            "movie_list_id",
+            "tmbd_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "movie_list_comparison_history_movie_list_id_losing_movie_list_item_id_movie_list_item_movie_list_id_tmbd_id_fk": {
+          "name": "movie_list_comparison_history_movie_list_id_losing_movie_list_item_id_movie_list_item_movie_list_id_tmbd_id_fk",
+          "tableFrom": "movie_list_comparison_history",
+          "tableTo": "movie_list_item",
+          "columnsFrom": [
+            "movie_list_id",
+            "losing_movie_list_item_id"
+          ],
+          "columnsTo": [
+            "movie_list_id",
+            "tmbd_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "movie_list_comparison_history_id_unique": {
+          "name": "movie_list_comparison_history_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.movie_list_item": {
+      "name": "movie_list_item",
+      "schema": "",
+      "columns": {
+        "tmbd_id": {
+          "name": "tmbd_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "movie_list_id": {
+          "name": "movie_list_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "current_elo": {
+          "name": "current_elo",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1500
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "movie_list_item_movie_list_id_movie_list_id_fk": {
+          "name": "movie_list_item_movie_list_id_movie_list_id_fk",
+          "tableFrom": "movie_list_item",
+          "tableTo": "movie_list",
+          "columnsFrom": [
+            "movie_list_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "movie_list_item_tmbd_id_movie_list_id_pk": {
+          "name": "movie_list_item_tmbd_id_movie_list_id_pk",
+          "columns": [
+            "tmbd_id",
+            "movie_list_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.user": {
       "name": "user",
       "schema": "",
@@ -40,6 +300,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "avatar": {
+          "name": "avatar",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
@@ -53,18 +319,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "avatar": {
-          "name": "avatar",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {},

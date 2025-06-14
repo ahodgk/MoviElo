@@ -19,8 +19,11 @@ import { Route as AuthRegisterImport } from './routes/_auth/register'
 import { Route as AuthLoginImport } from './routes/_auth/login'
 import { Route as AppAdminImport } from './routes/_app/admin'
 import { Route as AppProfileSetupIndexImport } from './routes/_app/profile-setup/index'
+import { Route as AppListsIndexImport } from './routes/_app/lists/index'
 import { Route as AppAdminIndexImport } from './routes/_app/admin/index'
 import { Route as AppAccountIndexImport } from './routes/_app/account/index'
+import { Route as AppListsNewImport } from './routes/_app/lists/new'
+import { Route as AppListsListIdImport } from './routes/_app/lists/$listId'
 import { Route as AppAccountSettingsImport } from './routes/_app/account/settings'
 
 // Create/Update Routes
@@ -71,6 +74,12 @@ const AppProfileSetupIndexRoute = AppProfileSetupIndexImport.update({
   getParentRoute: () => AppRoute,
 } as any)
 
+const AppListsIndexRoute = AppListsIndexImport.update({
+  id: '/lists/',
+  path: '/lists/',
+  getParentRoute: () => AppRoute,
+} as any)
+
 const AppAdminIndexRoute = AppAdminIndexImport.update({
   id: '/',
   path: '/',
@@ -80,6 +89,18 @@ const AppAdminIndexRoute = AppAdminIndexImport.update({
 const AppAccountIndexRoute = AppAccountIndexImport.update({
   id: '/account/',
   path: '/account/',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppListsNewRoute = AppListsNewImport.update({
+  id: '/lists/new',
+  path: '/lists/new',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppListsListIdRoute = AppListsListIdImport.update({
+  id: '/lists/$listId',
+  path: '/lists/$listId',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -149,6 +170,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAccountSettingsImport
       parentRoute: typeof AppImport
     }
+    '/_app/lists/$listId': {
+      id: '/_app/lists/$listId'
+      path: '/lists/$listId'
+      fullPath: '/lists/$listId'
+      preLoaderRoute: typeof AppListsListIdImport
+      parentRoute: typeof AppImport
+    }
+    '/_app/lists/new': {
+      id: '/_app/lists/new'
+      path: '/lists/new'
+      fullPath: '/lists/new'
+      preLoaderRoute: typeof AppListsNewImport
+      parentRoute: typeof AppImport
+    }
     '/_app/account/': {
       id: '/_app/account/'
       path: '/account'
@@ -162,6 +197,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AppAdminIndexImport
       parentRoute: typeof AppAdminImport
+    }
+    '/_app/lists/': {
+      id: '/_app/lists/'
+      path: '/lists'
+      fullPath: '/lists'
+      preLoaderRoute: typeof AppListsIndexImport
+      parentRoute: typeof AppImport
     }
     '/_app/profile-setup/': {
       id: '/_app/profile-setup/'
@@ -190,14 +232,20 @@ const AppAdminRouteWithChildren = AppAdminRoute._addFileChildren(
 interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRouteWithChildren
   AppAccountSettingsRoute: typeof AppAccountSettingsRoute
+  AppListsListIdRoute: typeof AppListsListIdRoute
+  AppListsNewRoute: typeof AppListsNewRoute
   AppAccountIndexRoute: typeof AppAccountIndexRoute
+  AppListsIndexRoute: typeof AppListsIndexRoute
   AppProfileSetupIndexRoute: typeof AppProfileSetupIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAdminRoute: AppAdminRouteWithChildren,
   AppAccountSettingsRoute: AppAccountSettingsRoute,
+  AppListsListIdRoute: AppListsListIdRoute,
+  AppListsNewRoute: AppListsNewRoute,
   AppAccountIndexRoute: AppAccountIndexRoute,
+  AppListsIndexRoute: AppListsIndexRoute,
   AppProfileSetupIndexRoute: AppProfileSetupIndexRoute,
 }
 
@@ -225,8 +273,11 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/account/settings': typeof AppAccountSettingsRoute
+  '/lists/$listId': typeof AppListsListIdRoute
+  '/lists/new': typeof AppListsNewRoute
   '/account': typeof AppAccountIndexRoute
   '/admin/': typeof AppAdminIndexRoute
+  '/lists': typeof AppListsIndexRoute
   '/profile-setup': typeof AppProfileSetupIndexRoute
 }
 
@@ -237,8 +288,11 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/account/settings': typeof AppAccountSettingsRoute
+  '/lists/$listId': typeof AppListsListIdRoute
+  '/lists/new': typeof AppListsNewRoute
   '/account': typeof AppAccountIndexRoute
   '/admin': typeof AppAdminIndexRoute
+  '/lists': typeof AppListsIndexRoute
   '/profile-setup': typeof AppProfileSetupIndexRoute
 }
 
@@ -252,8 +306,11 @@ export interface FileRoutesById {
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_app/account/settings': typeof AppAccountSettingsRoute
+  '/_app/lists/$listId': typeof AppListsListIdRoute
+  '/_app/lists/new': typeof AppListsNewRoute
   '/_app/account/': typeof AppAccountIndexRoute
   '/_app/admin/': typeof AppAdminIndexRoute
+  '/_app/lists/': typeof AppListsIndexRoute
   '/_app/profile-setup/': typeof AppProfileSetupIndexRoute
 }
 
@@ -267,8 +324,11 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/account/settings'
+    | '/lists/$listId'
+    | '/lists/new'
     | '/account'
     | '/admin/'
+    | '/lists'
     | '/profile-setup'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -278,8 +338,11 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/account/settings'
+    | '/lists/$listId'
+    | '/lists/new'
     | '/account'
     | '/admin'
+    | '/lists'
     | '/profile-setup'
   id:
     | '__root__'
@@ -291,8 +354,11 @@ export interface FileRouteTypes {
     | '/_auth/register'
     | '/_auth/reset-password'
     | '/_app/account/settings'
+    | '/_app/lists/$listId'
+    | '/_app/lists/new'
     | '/_app/account/'
     | '/_app/admin/'
+    | '/_app/lists/'
     | '/_app/profile-setup/'
   fileRoutesById: FileRoutesById
 }
@@ -332,7 +398,10 @@ export const routeTree = rootRoute
       "children": [
         "/_app/admin",
         "/_app/account/settings",
+        "/_app/lists/$listId",
+        "/_app/lists/new",
         "/_app/account/",
+        "/_app/lists/",
         "/_app/profile-setup/"
       ]
     },
@@ -367,6 +436,14 @@ export const routeTree = rootRoute
       "filePath": "_app/account/settings.tsx",
       "parent": "/_app"
     },
+    "/_app/lists/$listId": {
+      "filePath": "_app/lists/$listId.tsx",
+      "parent": "/_app"
+    },
+    "/_app/lists/new": {
+      "filePath": "_app/lists/new.tsx",
+      "parent": "/_app"
+    },
     "/_app/account/": {
       "filePath": "_app/account/index.tsx",
       "parent": "/_app"
@@ -374,6 +451,10 @@ export const routeTree = rootRoute
     "/_app/admin/": {
       "filePath": "_app/admin/index.tsx",
       "parent": "/_app/admin"
+    },
+    "/_app/lists/": {
+      "filePath": "_app/lists/index.tsx",
+      "parent": "/_app"
     },
     "/_app/profile-setup/": {
       "filePath": "_app/profile-setup/index.tsx",

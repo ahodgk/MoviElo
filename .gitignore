@@ -49,3 +49,6 @@ node_modules
 dist
 schema/generated
 /packages/database/prisma/schema/generated/
+
+scratch*
+.cache

@@ -1,4 +1,4 @@
-import { eq, userProfile } from "@repo/database";
+import { eq, movieList, userProfile } from "@repo/database";
 import { createUpdateSchema } from "@repo/database/zod";
 import { createServerFn } from "@tanstack/react-start";
 import { getSupabaseServerClient } from "~/utils/supabase";
@@ -44,15 +44,11 @@ export const setUserProfileFn = createServerFn({ method: "POST" })
   .middleware([protectMiddleware])
   .validator(
     createUpdateSchema(userProfile).pick({
-      surgeryDate: true,
-      surgeryName: true,
       avatarUrl: true,
-      affectedBodyPart: true,
+
       firstName: true,
       lastName: true,
-      option_hidePWABanner: true,
-      lastSkippedDailyProgress: true,
-    }),
+    })
   )
   .handler(async ({ data, context }) => {
     const { user } = context;
