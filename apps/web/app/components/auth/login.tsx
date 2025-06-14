@@ -8,14 +8,14 @@ import { useForm } from "react-hook-form";
 import { AiOutlineGoogle } from "react-icons/ai";
 import { z } from "zod";
 // import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "~/components/ui/card";
 import {
   Form,
   FormControl,
@@ -23,8 +23,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "~/components/ui/form";
+import { Input } from "~/components/ui/input";
 import { loginFn } from "~/lib/functions/auth/login";
 import { useSignupWithGoogleMutation } from "~/lib/queries/user";
 import { Separator } from "../ui/separator";
