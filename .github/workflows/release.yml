@@ -37,7 +37,7 @@ jobs:
     needs:
     - build
     - checks
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: docker login
         env:

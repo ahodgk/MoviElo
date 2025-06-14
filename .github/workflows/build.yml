@@ -30,7 +30,7 @@ jobs:
       contents: read
       packages: write
     runs-on:
-      - self-hosted
+      - ubuntu-latest
     steps:
       - name: Self-hosted docker login
         env:

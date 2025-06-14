@@ -38,7 +38,7 @@ jobs:
       # url: ${{ inputs.environment == 'production' && 'https://flixxr.xyz' || 'https://beta.flixxr.xyz'}}
     env:
       compose: ${{ inputs.environment == 'production' && 'prod' || 'stage'}}
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: SCP Command to Transfer Files
