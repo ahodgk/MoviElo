@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 // import { Card, CardContent, CardHeader } from "@/components/shadcn/card";
 
 export const Route = createFileRoute("/")({
@@ -6,6 +6,12 @@ export const Route = createFileRoute("/")({
 
   beforeLoad: async ({ context }) => {
     const { user } = context;
+
+    if (!user) {
+      return { redirect: { to: "/login" } };
+    }
+    // return { redirect: { to: "/lists" } };
+    return redirect({ to: "/lists" });
   },
   loader: () => {},
 });

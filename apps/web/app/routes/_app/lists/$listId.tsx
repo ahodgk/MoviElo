@@ -16,7 +16,7 @@ import {
   Search,
 } from "lucide-react";
 import { Suspense, useCallback, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import short from "short-uuid";
 import { z } from "zod";
 import { InfoTooltip } from "~/components/InfoTooltip";
@@ -51,6 +51,7 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { Skeleton } from "~/components/ui/skeleton";
 import { Slider } from "~/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import {
@@ -63,6 +64,7 @@ import {
   getListComparisonHistoryQueryOptions,
   getListDetailsQueryOptions,
   getListItemsQueryOptions,
+  type TGetListDetails,
   useAddItemToListMutation,
   useEditListMutation,
   useResetListMutation,
@@ -71,6 +73,7 @@ import {
   getMovieDetailsQueryOptions,
   listMoviesQueryOptions,
 } from "~/lib/queries/tmdb/list-movies";
+import { K } from "~/lib/utils/elo";
 import { selectTwoRandomItems } from "./-weighted_choice";
 
 type MovieListItem = typeof movieListItem.$inferSelect;
@@ -117,7 +120,10 @@ function RouteComponent() {
           <div className="flex flex-row gap-6">
             <div className="grow-[2] xl:max-w-2/3">
               <TabsContent value="items" className="w-full">
-                <AddMovieSection listId={listId} />
+                <AddMovieSection
+                  listId={listId}
+                  currentMovieIds={listDetails.items.map((it) => it.tmdbId)}
+                />
               </TabsContent>
               <TabsContent
                 value="comparison"
@@ -146,7 +152,7 @@ function RouteComponent() {
   );
 }
 
-const ListDetailsCard = ({ listDetails }: { listDetails: MovieList }) => {
+const ListDetailsCard = ({ listDetails }: { listDetails: TGetListDetails }) => {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const closeEditMode = useCallback(() => {
@@ -174,7 +180,7 @@ const ViewListDetailsCard = ({
   listDetails,
   setEditMode,
 }: {
-  listDetails: MovieList;
+  listDetails: TGetListDetails;
   setEditMode: () => void;
 }) => {
   const resetEloMutation = useResetListMutation();
@@ -208,6 +214,18 @@ const ViewListDetailsCard = ({
             Tuning Factor
             <InfoTooltip text="The tuning factor determines how quickly the K factor decreases, based on how many matches an item has had so far" />
             : {listDetails?.tuningFactor}
+          </div>
+          <div className="flex flex-row items-center gap-1 mt-2">
+            <em>Effective K</em>
+            <InfoTooltip text="The effective value of K calculated using the average history count for items in this list" />
+            :{" "}
+            <em>
+              {K(
+                listDetails.initialK,
+                (listDetails.historyCount * 2) / listDetails.items.length,
+                listDetails.tuningFactor,
+              ).toFixed(2)}
+            </em>
           </div>
         </div>
       </CardContent>
@@ -255,7 +273,7 @@ const EditListDetailsCard = ({
   listDetails,
   closeEditMode,
 }: {
-  listDetails: MovieList;
+  listDetails: TGetListDetails;
   closeEditMode: () => void;
 }) => {
   const form = useForm<z.infer<typeof editSchema>>({
@@ -295,6 +313,15 @@ const EditListDetailsCard = ({
     closeEditMode();
   }, [closeEditMode, form.formState.isDirty]);
 
+  const kFactor = useWatch({
+    control: form.control,
+    name: "kFactor",
+  });
+  const tuningFactor = useWatch({
+    control: form.control,
+    name: "tuningFactor",
+  });
+
   return (
     <>
       {/** biome-ignore lint/a11y/noStaticElementInteractions: idc */}
@@ -303,6 +330,7 @@ const EditListDetailsCard = ({
         onClick={triggerClose}
         onKeyDown={(e) => {
           if (e.key === "Escape") {
+            e.preventDefault();
             triggerClose();
           }
         }}
@@ -314,7 +342,14 @@ const EditListDetailsCard = ({
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Editing List</CardTitle>
-                <Button className="" variant={"ghost"} onClick={triggerClose}>
+                <Button
+                  className=""
+                  variant={"ghost"}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    triggerClose();
+                  }}
+                >
                   Close
                 </Button>
               </div>
@@ -342,72 +377,87 @@ const EditListDetailsCard = ({
                   </FormItem>
                 )}
               />
-              <div className="flex flex-col gap-4 grow">
-                <FormField
-                  control={form.control}
-                  name="kFactor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>K Factor:</FormLabel>
-                      <FormControl>
-                        <div className="flex flex-row gap-2 items-center">
-                          <Input
-                            type="number"
-                            className="max-w-24"
-                            {...field}
-                          />
-                          <Slider
-                            className="max-w-3xs"
-                            min={1}
-                            max={100}
-                            step={1}
-                            defaultValue={[field.value]}
-                            onValueChange={
-                              (e) => field.onChange(e[0]) // Slider returns an array
-                            }
-                          />
-                        </div>
-                      </FormControl>
-                      <FormDescription>
-                        Controls how much a comparison affects a movie's score.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="tuningFactor"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tuning Factor:</FormLabel>
-                      <FormControl>
-                        <div className="flex flex-row gap-2 items-center">
-                          <Input
-                            type="number"
-                            className="max-w-24"
-                            {...field}
-                          />
-                          <Slider
-                            className="max-w-3xs"
-                            min={1}
-                            max={100}
-                            step={1}
-                            defaultValue={[field.value]}
-                            onValueChange={
-                              (e) => field.onChange(e[0]) // Slider returns an array
-                            }
-                          />
-                        </div>
-                      </FormControl>
-                      <FormDescription>
-                        Controls how quickly the effective <em>K</em> decreases
-                        as a movie is compared more.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="flex flex-row gap-6 items-start">
+                <div className="flex flex-col gap-4">
+                  <FormField
+                    control={form.control}
+                    name="kFactor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>K Factor:</FormLabel>
+                        <FormControl>
+                          <div className="flex flex-row gap-2 items-center">
+                            <Input
+                              type="number"
+                              className="max-w-24"
+                              {...field}
+                            />
+                            <Slider
+                              className="max-w-3xs"
+                              min={1}
+                              max={100}
+                              step={1}
+                              defaultValue={[field.value]}
+                              onValueChange={
+                                (e) => field.onChange(e[0]) // Slider returns an array
+                              }
+                            />
+                          </div>
+                        </FormControl>
+                        <FormDescription>
+                          Controls how much a comparison affects a movie's
+                          score.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="tuningFactor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tuning Factor:</FormLabel>
+                        <FormControl>
+                          <div className="flex flex-row gap-2 items-center">
+                            <Input
+                              type="number"
+                              className="max-w-24"
+                              {...field}
+                            />
+                            <Slider
+                              className="max-w-3xs"
+                              min={1}
+                              max={100}
+                              step={1}
+                              defaultValue={[field.value]}
+                              onValueChange={
+                                (e) => field.onChange(e[0]) // Slider returns an array
+                              }
+                            />
+                          </div>
+                        </FormControl>
+                        <FormDescription>
+                          Controls how quickly the effective <em>K</em>{" "}
+                          decreases as a movie is compared more.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex flex-row items-center gap-1 mt-2">
+                  <em>Effective K</em>
+                  <InfoTooltip text="The effective value of K calculated using the average history count for items in this list" />
+                  :{" "}
+                  <em>
+                    {K(
+                      kFactor,
+                      (listDetails.historyCount * 2) / listDetails.items.length,
+                      tuningFactor,
+                    ).toFixed(2)}
+                  </em>
+                </div>
               </div>
             </CardContent>
 
@@ -668,9 +718,11 @@ const ListRankingsCard = ({ list }: { list?: MovieListItem[] }) => {
       <CardContent className="flex flex-col gap-4">
         {list
           .sort((a, b) => b.currentElo - a.currentElo)
-          .map((item, i) => (
-            <MovieListRankCard key={item.tmdbId} item={item} index={i} />
-          ))}
+          .map((item, i) =>
+            item.tmdbId ? (
+              <MovieListRankCard key={item.tmdbId} item={item} index={i} />
+            ) : null,
+          )}
       </CardContent>
     </Card>
   );
@@ -683,24 +735,30 @@ const MovieListRankCard = ({
   item: MovieListItem;
   index: number;
 }) => {
-  const { data } = useQuery(getMovieDetailsQueryOptions(item.tmdbId));
+  const { data, isLoading } = useQuery(
+    getMovieDetailsQueryOptions(item.tmdbId),
+  );
 
   return (
     <Card className="overflow-hidden">
       <div className="flex flex-row items-center gap-2 pr-4">
         <figure className="h-20 w-auto">
-          <img
-            className="h-full w-auto"
-            alt={`Movie poster for ${data?.original_title}`}
-            src={`https://image.tmdb.org/t/p/w200${data?.poster_path}`}
-          />
+          {!isLoading ? (
+            <img
+              className="h-full w-auto"
+              alt={`Movie poster for ${data?.original_title}`}
+              src={`https://image.tmdb.org/t/p/w200${data?.poster_path}`}
+            />
+          ) : (
+            <Skeleton className="h-full w-12" />
+          )}
         </figure>
         <span className="">
           <span className="flex flex-row items-center text-xl">
             <Hash className="size-5" />
             {index + 1}
           </span>
-          {data?.title}
+          {data?.title ?? <Skeleton className="h-4 w-40" />}
         </span>
         <div className="ml-auto">
           <span>Elo: {item.currentElo}</span>
@@ -710,7 +768,13 @@ const MovieListRankCard = ({
   );
 };
 
-const AddMovieSection = ({ listId }: { listId: string }) => {
+const AddMovieSection = ({
+  listId,
+  currentMovieIds,
+}: {
+  listId: string;
+  currentMovieIds?: string[];
+}) => {
   const [searchString, setSearchString] = useState("");
   const [debouncedSearchString] = useThrottledValue(searchString, {
     wait: 500,
@@ -742,47 +806,71 @@ const AddMovieSection = ({ listId }: { listId: string }) => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
             {data?.map((movie) => (
-              <Card key={movie.id} className="mt-4 overflow-hidden">
-                {/* <CardHeader>{movie.title}</CardHeader> */}
-                <CardContent className="p-0 ">
-                  <img
-                    className="w-full"
-                    alt={`Poster for ${movie.title}`}
-                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                  />
-                </CardContent>
-                <CardFooter className="p-4 flex sm:flex-row flex-col items-start">
-                  <div className="flex flex-col">
-                    <CardTitle className="mt-0 pt-0">{movie.title}</CardTitle>
-                    <CardDescription className="clear-left mt-1">
-                      ({movie.release_date?.split("-")[0]})
-                    </CardDescription>
-                  </div>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant={"ghost"}
-                        onClick={() => {
-                          addMovieToListMutation.mutate({
-                            data: {
-                              tmdbid: String(movie.id),
-                              listId: listId,
-                            },
-                          });
-                        }}
-                        className="ml-auto relative"
-                      >
-                        <ListPlus className="size-6" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Add to list</TooltipContent>
-                  </Tooltip>
-                </CardFooter>
-              </Card>
+              <AddMovieCardItem
+                key={movie.id}
+                movie={movie}
+                addMovie={() =>
+                  addMovieToListMutation.mutate({
+                    data: {
+                      tmdbid: String(movie.id),
+                      listId: listId,
+                    },
+                  })
+                }
+                currentMovieIds={currentMovieIds}
+              />
             ))}
           </div>
         </div>
       </CardContent>
+    </Card>
+  );
+};
+
+const AddMovieCardItem = ({
+  movie,
+  addMovie,
+  currentMovieIds,
+}: {
+  currentMovieIds?: string[];
+  movie: {
+    id: number;
+    release_date: string;
+    title: string;
+    poster_path: string;
+  };
+  addMovie: () => void;
+}) => {
+  const included = currentMovieIds?.includes(String(movie.id));
+
+  return (
+    <Card key={movie.id} className="mt-4 overflow-hidden">
+      {/* <CardHeader>{movie.title}</CardHeader> */}
+      <CardContent className="p-0 ">
+        <img
+          className="w-full"
+          alt={`Poster for ${movie.title}`}
+          src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+        />
+      </CardContent>
+      <CardFooter className="p-4 flex sm:flex-row flex-col items-start">
+        <div className="flex flex-col">
+          <CardTitle className="mt-0 pt-0">{movie.title}</CardTitle>
+          <CardDescription className="clear-left mt-1">
+            ({movie.release_date?.split("-")[0]})
+          </CardDescription>
+        </div>
+        <Tooltip>
+          <TooltipTrigger className="ml-auto relative ">
+            <Button variant={"ghost"} disabled={included} onClick={addMovie}>
+              <ListPlus className="size-6" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {included ? "Already added" : "Add to list"}
+          </TooltipContent>
+        </Tooltip>
+      </CardFooter>
     </Card>
   );
 };

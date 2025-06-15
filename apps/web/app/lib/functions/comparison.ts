@@ -12,6 +12,7 @@ import { z } from "zod";
 import { db } from "../db";
 import { logger } from "../logger";
 import { protectMiddleware } from "../middleware/auth";
+import { adjustElo } from "../utils/elo";
 
 export const compareMovieFn = createServerFn()
   .middleware([protectMiddleware])
@@ -124,21 +125,6 @@ const updateElo = (tmdbId: string, listId: string, elo: number) => {
     );
 };
 
-const adjustElo = (
-  elo: number,
-  expected_score: number,
-  score: number,
-  initial_k: number,
-  count: number,
-  tuning_param: number,
-) => {
-  const k = K(initial_k, count, tuning_param); // Assuming count is 0 for initial calculation
-  return elo + k * (score - expected_score);
-};
-
-const K = (initial_k: number, count: number, tuning_param: number) => {
-  return initial_k / (1 + count / tuning_param);
-};
 
 const getItemEloData = (listId: string, itemId: string) =>
   db

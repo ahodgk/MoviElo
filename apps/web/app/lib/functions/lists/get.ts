@@ -31,6 +31,14 @@ export const getListDetails = createServerFn()
   .middleware([protectMiddleware])
   .validator(z.object({ listId: z.string() }))
   .handler(async ({ context, data }) => {
+
+    const historyCountPromise = db
+      .select({
+        count: count(movieListComparisonHistory.id),
+      })
+      .from(movieListComparisonHistory)
+      .where(eq(movieListComparisonHistory.movieListId, data.listId));
+
     const list = await db.query.movieList.findFirst({
       where: and(
         eq(movieList.userId, context.user.id),
@@ -45,7 +53,7 @@ export const getListDetails = createServerFn()
     if (!list) {
       throw new Error("List not found or access denied");
     }
-    return list;
+    return {...list, historyCount: (await historyCountPromise)[0].count};
   });
 
 export const getListItemsFn = createServerFn()
