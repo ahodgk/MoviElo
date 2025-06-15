@@ -48,3 +48,37 @@ export const resetEloFn = createServerFn()
         .where(eq(movieListComparisonHistory.movieListId, data.listId));
     });
   });
+
+export const editListFn = createServerFn()
+  .middleware([protectMiddleware])
+  .validator(
+    z.object({
+      listId: z.string(),
+      name: z.string(),
+      initialK: z.number(),
+      tuningFactor: z.number(),
+    }),
+  )
+  .handler(async ({ context, data }) => {
+    const lists = await db
+      .update(movieList)
+      .set({
+        name: data.name,
+        initialK: data.initialK,
+        tuningFactor: data.tuningFactor,
+      })
+      .where(
+        and(
+          eq(movieList.id, data.listId),
+          eq(movieList.userId, context.user.id),
+        ),
+      )
+      .returning();
+
+    const list = lists[0];
+    if (!list || lists.length === 0) {
+      throw new Error("List not found or access denied");
+    }
+
+    return list;
+  });

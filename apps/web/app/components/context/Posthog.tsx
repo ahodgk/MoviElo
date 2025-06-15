@@ -9,7 +9,8 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
   const { user } = useRouteContext({ from: "__root__" });
   useEffect(() => {
     posthog.init(
-      "phc_E899W2RJtuTN2akyIIbkZwBgmAko5sZLRtnlDsw2lvq",
+      "",
+      // "phc_E899W2RJtuTN2akyIIbkZwBgmAko5sZLRtnlDsw2lvq",
       // ??
       // ((import.meta.env.VITE_PUBLIC_POSTHOG_KEY as string) ||
       // (process.env.VITE_PUBLIC_POSTHOG_KEY as string))

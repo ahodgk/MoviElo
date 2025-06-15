@@ -9,7 +9,9 @@ export const useCompareMoviesMutation = () => {
   const compareMovie = useServerFn(compareMovieFn);
   return useMutation({
     mutationFn: compareMovie,
-    onMutate: (data) => data.data,
+    onMutate: (data) => {
+      return data.data;
+    },
     onError: (err) => {
       toast.error("Something went wrong, those results may not be recorded.");
       logger.error(err, "Error comparing movies");

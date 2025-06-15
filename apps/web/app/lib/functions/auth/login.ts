@@ -24,7 +24,7 @@ export const loginFn = createServerFn({ method: "POST" })
 
     // Redirect to the prev page stored in the "redirect" search param
     throw redirect({
-      href: data.redirectUrl || "/dashboard",
+      href: data.redirectUrl || "/lists",
       reloadDocument: true,
     });
   });

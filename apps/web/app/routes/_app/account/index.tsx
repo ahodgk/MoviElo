@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -16,7 +15,6 @@ import {
 //   type AlertDialogState,
 // } from "@/components/custom/AlertDialog";
 import { Button } from "~/components/ui/button";
-import { resetPasswordFn } from "~/lib/functions/auth/reset-password";
 
 export const Route = createFileRoute("/_app/account/")({
   component: ProfilePage,
@@ -28,16 +26,16 @@ export default function ProfilePage() {
   // });
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
 
-  const deleteAccountClicked = () => setIsAlertDialogOpen(true);
+  // const deleteAccountClicked = () => setIsAlertDialogOpen(true);
 
   // const { form } = useEditProfileForm();
 
   const { user } = Route.useRouteContext();
 
-  const resetPassword = useServerFn(resetPasswordFn);
-  const onResetPassword = async () => {
-    await resetPassword({ data: { email: user?.email ?? "" } });
-  };
+  // const resetPassword = useServerFn(resetPasswordFn);
+  // const onResetPassword = async () => {
+  //   await resetPassword({ data: { email: user?.email ?? "" } });
+  // };
 
   return (
     <div className="flex flex-col items-center min-h-screen w-full">

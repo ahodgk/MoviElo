@@ -1,4 +1,4 @@
-import { TooltipTrigger } from "@radix-ui/react-tooltip";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type {
   movieList,
   movieListComparisonHistory,
@@ -16,7 +16,10 @@ import {
   Search,
 } from "lucide-react";
 import { Suspense, useCallback, useState } from "react";
+import { useForm } from "react-hook-form";
 import short from "short-uuid";
+import { z } from "zod";
+import { InfoTooltip } from "~/components/InfoTooltip";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,17 +40,31 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Slider } from "~/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { Tooltip, TooltipContent } from "~/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 import { useCompareMoviesMutation } from "~/lib/queries/comparison";
 import {
   getListComparisonHistoryQueryOptions,
   getListDetailsQueryOptions,
   getListItemsQueryOptions,
   useAddItemToListMutation,
+  useEditListMutation,
   useResetListMutation,
 } from "~/lib/queries/lists";
 import {
@@ -78,69 +95,29 @@ export const Route = createFileRoute("/_app/lists/$listId")({
 
 function RouteComponent() {
   const { listId } = Route.useParams();
-  const {
-    data: { list: listDetails },
-  } = useSuspenseQuery(getListDetailsQueryOptions(listId));
+  const { data: listDetails } = useQuery(getListDetailsQueryOptions(listId));
 
-  const resetEloMutation = useResetListMutation();
+  console.log("listDetails", listDetails);
+
+  if (!listDetails) {
+    return <div className="p-6">List not found</div>;
+  }
+
   return (
     <div className="p-6 flex flex-col gap-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>{listDetails?.name}</CardTitle>
-            <Button className="" variant={"ghost"}>
-              <PenBox className="size-6 text-muted-foreground" />
-            </Button>
-          </div>
-          <CardDescription>
-            Last updated at:{" "}
-            {listDetails?.updatedAt?.toTimeString().split(" ")[0] +
-              " " +
-              listDetails?.updatedAt?.toDateString()}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <Slider />
-
-          <div className="flex flex-row gap-4 items-center justify-end">
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant={"destructive"}>Reset</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will reset the current
-                    weightings and elo have.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => {
-                      resetEloMutation.mutate({ data: { listId } });
-                    }}
-                  >
-                    Continue
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        </CardContent>
-      </Card>
-
+      <ListDetailsCard listDetails={listDetails} />
       <div className="flex flex-col gap-6 grow-[2]">
         <Tabs defaultValue="items" className="w-full">
           <TabsList className="">
             <TabsTrigger value="items">Add movies</TabsTrigger>
             <TabsTrigger value="comparison">Comparison</TabsTrigger>
             <TabsTrigger value="history">History</TabsTrigger>
+            <TabsTrigger className="  xl:!hidden" value="list">
+              List
+            </TabsTrigger>
           </TabsList>
           <div className="flex flex-row gap-6">
-            <div className="grow-[2] max-w-2/3">
+            <div className="grow-[2] xl:max-w-2/3">
               <TabsContent value="items" className="w-full">
                 <AddMovieSection listId={listId} />
               </TabsContent>
@@ -154,8 +131,14 @@ function RouteComponent() {
 
                 <MovieComparisonHistoryCard listId={listId} />
               </TabsContent>
+              <TabsContent value="history" className="w-full">
+                <MovieComparisonHistoryCard listId={listId} />
+              </TabsContent>
+              <TabsContent value="list" className="w-full">
+                <ListRankingsCard list={listDetails?.items} />
+              </TabsContent>
             </div>
-            <div className="grow-[1] mt-2">
+            <div className="grow-[1] mt-2 xl:block hidden">
               <ListRankingsCard list={listDetails?.items} />
             </div>
           </div>
@@ -164,6 +147,297 @@ function RouteComponent() {
     </div>
   );
 }
+
+const ListDetailsCard = ({ listDetails }: { listDetails: MovieList }) => {
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const closeEditMode = useCallback(() => {
+    setIsEditMode(false);
+  }, []);
+
+  return (
+    <div>
+      {isEditMode ? (
+        <EditListDetailsCard
+          listDetails={listDetails}
+          closeEditMode={closeEditMode}
+        />
+      ) : (
+        <ViewListDetailsCard
+          listDetails={listDetails}
+          setEditMode={() => setIsEditMode(true)}
+        />
+      )}
+    </div>
+  );
+};
+
+const ViewListDetailsCard = ({
+  listDetails,
+  setEditMode,
+}: {
+  listDetails: MovieList;
+  setEditMode: () => void;
+}) => {
+  const resetEloMutation = useResetListMutation();
+  return (
+    <Card className="z-20 relative">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle>{listDetails?.name}</CardTitle>
+          <Button className="" variant={"ghost"} onClick={() => setEditMode()}>
+            <PenBox className="size-6 text-muted-foreground" />
+          </Button>
+        </div>
+        <CardDescription>
+          Last updated at:{" "}
+          {listDetails?.updatedAt?.toTimeString().split(" ")[0] +
+            " " +
+            listDetails?.updatedAt?.toDateString()}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <div>
+          <div className="flex flex-row items-center gap-1">
+            <InfoTooltip
+              text="The K factor determines how quickly the Elo rating changes. A higher K
+        factor means ratings change more quickly."
+            />
+            K Factor : {listDetails?.initialK}
+          </div>
+          <div className="flex flex-row items-center gap-1">
+            <InfoTooltip text="The tuning factor determines how quickly the K factor decreases, based on how many matches an item has had so far" />
+            Tuning Factor: {listDetails?.tuningFactor}
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <div className="flex flex-row gap-4 items-center w-full justify-end">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant={"destructive"}>Reset</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will reset the current
+                  weightings and elo have.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    resetEloMutation.mutate({
+                      data: { listId: listDetails.id },
+                    });
+                  }}
+                >
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </CardFooter>
+    </Card>
+  );
+};
+
+const editSchema = z.object({
+  kFactor: z.coerce.number().min(1).max(100).default(20),
+  tuningFactor: z.coerce.number().min(1).max(100).default(10),
+  name: z.string().min(1).max(100).default("My Movie List"),
+});
+
+const EditListDetailsCard = ({
+  listDetails,
+  closeEditMode,
+}: {
+  listDetails: MovieList;
+  closeEditMode: () => void;
+}) => {
+  const form = useForm<z.infer<typeof editSchema>>({
+    resolver: zodResolver(editSchema),
+    defaultValues: {
+      kFactor: listDetails.initialK,
+      tuningFactor: listDetails.tuningFactor,
+      name: listDetails.name,
+    },
+  });
+
+  const editListMutation = useEditListMutation();
+
+  const handleSubmit = (data: z.infer<typeof editSchema>) => {
+    editListMutation.mutate({
+      data: {
+        listId: listDetails.id,
+        name: data.name,
+        initialK: data.kFactor,
+        tuningFactor: data.tuningFactor,
+      },
+    });
+    closeEditMode();
+  };
+
+  const [closeDialogOpen, setCloseDialogOpen] = useState(false);
+
+  const triggerClose = useCallback(() => {
+    // setCloseDialogOpen(true);
+    // return;
+
+    // console.log(form.control._formValues);
+    if (form.formState.isDirty) {
+      setCloseDialogOpen(true);
+      return;
+    }
+    closeEditMode();
+  }, [closeEditMode, form.formState.isDirty]);
+
+  return (
+    <>
+      {/** biome-ignore lint/a11y/noStaticElementInteractions: idc */}
+      <div
+        className="fixed w-full h-full bg-black/40 inset-0  "
+        onClick={triggerClose}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") {
+            triggerClose();
+          }
+        }}
+      />
+      <Card className="z-20 relative">
+        {/* dirty: {form.formState.isDirty ? "yes" : "no"} */}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)}>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Editing List</CardTitle>
+                <Button className="" variant={"ghost"} onClick={triggerClose}>
+                  Close
+                </Button>
+              </div>
+              <CardDescription>
+                Last updated at:{" "}
+                {listDetails?.updatedAt?.toTimeString().split(" ")[0] +
+                  " " +
+                  listDetails?.updatedAt?.toDateString()}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-6 ">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="grow-2">
+                    <FormLabel>List Title:</FormLabel>
+                    <FormControl>
+                      <div className="flex flex-row gap-2 items-center">
+                        <Input type="text" className="" {...field} />
+                      </div>
+                    </FormControl>
+                    <FormDescription />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex flex-col gap-4 grow">
+                <FormField
+                  control={form.control}
+                  name="kFactor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>K Factor:</FormLabel>
+                      <FormControl>
+                        <div className="flex flex-row gap-2 items-center">
+                          <Input
+                            type="number"
+                            className="max-w-24"
+                            {...field}
+                          />
+                          <Slider
+                            className="max-w-3xs"
+                            min={1}
+                            max={100}
+                            step={1}
+                            defaultValue={[field.value]}
+                            onValueChange={
+                              (e) => field.onChange(e[0]) // Slider returns an array
+                            }
+                          />
+                        </div>
+                      </FormControl>
+                      <FormDescription>
+                        Controls how much a comparison affects a movie's score.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="tuningFactor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tuning Factor:</FormLabel>
+                      <FormControl>
+                        <div className="flex flex-row gap-2 items-center">
+                          <Input
+                            type="number"
+                            className="max-w-24"
+                            {...field}
+                          />
+                          <Slider
+                            className="max-w-3xs"
+                            min={1}
+                            max={100}
+                            step={1}
+                            defaultValue={[field.value]}
+                            onValueChange={
+                              (e) => field.onChange(e[0]) // Slider returns an array
+                            }
+                          />
+                        </div>
+                      </FormControl>
+                      <FormDescription>
+                        Controls how quickly the effective <em>K</em> decreases
+                        as a movie is compared more.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
+
+            <CardFooter>
+              <Button type="submit">Save</Button>
+            </CardFooter>
+          </form>
+        </Form>
+      </Card>
+      <AlertDialog open={closeDialogOpen} onOpenChange={setCloseDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved changes</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have unsaved changes. Are you sure you want to leave this
+              page?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={closeEditMode}>
+              Leave without saving
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+};
 
 const MovieComparisonHistoryCard = ({ listId }: { listId: string }) => {
   const { data } = useQuery(getListComparisonHistoryQueryOptions(listId));
@@ -393,7 +667,7 @@ const ListRankingsCard = ({ list }: { list?: MovieListItem[] }) => {
           Here you can see the current rankings of movies in your list.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col gap-4">
         {list
           .sort((a, b) => b.currentElo - a.currentElo)
           .map((item, i) => (
@@ -414,7 +688,7 @@ const MovieListRankCard = ({
   const { data } = useQuery(getMovieDetailsQueryOptions(item.tmdbId));
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <div className="flex flex-row items-center gap-2 pr-4">
         <figure className="h-20 w-auto">
           <img
@@ -468,17 +742,18 @@ const AddMovieSection = ({ listId }: { listId: string }) => {
             <Search className="absolute left-2 top-2 size-5 text-muted-foreground" />
           </Label>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
             {data?.map((movie) => (
               <Card key={movie.id} className="mt-4 overflow-hidden">
                 {/* <CardHeader>{movie.title}</CardHeader> */}
                 <CardContent className="p-0 ">
                   <img
+                    className="w-full"
                     alt={`Poster for ${movie.title}`}
                     src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                   />
                 </CardContent>
-                <CardFooter className="p-4 flex row items-start">
+                <CardFooter className="p-4 flex sm:flex-row flex-col items-start">
                   <div className="flex flex-col">
                     <CardTitle className="mt-0 pt-0">{movie.title}</CardTitle>
                     <CardDescription className="clear-left mt-1">

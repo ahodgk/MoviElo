@@ -68,12 +68,8 @@
           "name": "movie_list_user_id_user_id_fk",
           "tableFrom": "movie_list",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -83,9 +79,7 @@
         "movie_list_id_unique": {
           "name": "movie_list_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "policies": {},
@@ -148,12 +142,8 @@
           "name": "movie_list_comparison_history_movie_list_id_movie_list_id_fk",
           "tableFrom": "movie_list_comparison_history",
           "tableTo": "movie_list",
-          "columnsFrom": [
-            "movie_list_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["movie_list_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -161,14 +151,8 @@
           "name": "movie_list_comparison_history_movie_list_id_winning_movie_list_item_id_movie_list_item_movie_list_id_tmdb_id_fk",
           "tableFrom": "movie_list_comparison_history",
           "tableTo": "movie_list_item",
-          "columnsFrom": [
-            "movie_list_id",
-            "winning_movie_list_item_id"
-          ],
-          "columnsTo": [
-            "movie_list_id",
-            "tmdb_id"
-          ],
+          "columnsFrom": ["movie_list_id", "winning_movie_list_item_id"],
+          "columnsTo": ["movie_list_id", "tmdb_id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         },
@@ -176,14 +160,8 @@
           "name": "movie_list_comparison_history_movie_list_id_losing_movie_list_item_id_movie_list_item_movie_list_id_tmdb_id_fk",
           "tableFrom": "movie_list_comparison_history",
           "tableTo": "movie_list_item",
-          "columnsFrom": [
-            "movie_list_id",
-            "losing_movie_list_item_id"
-          ],
-          "columnsTo": [
-            "movie_list_id",
-            "tmdb_id"
-          ],
+          "columnsFrom": ["movie_list_id", "losing_movie_list_item_id"],
+          "columnsTo": ["movie_list_id", "tmdb_id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -193,9 +171,7 @@
         "movie_list_comparison_history_id_unique": {
           "name": "movie_list_comparison_history_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "policies": {},
@@ -252,12 +228,8 @@
           "name": "movie_list_item_movie_list_id_movie_list_id_fk",
           "tableFrom": "movie_list_item",
           "tableTo": "movie_list",
-          "columnsFrom": [
-            "movie_list_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["movie_list_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -265,10 +237,7 @@
       "compositePrimaryKeys": {
         "movie_list_item_tmdb_id_movie_list_id_pk": {
           "name": "movie_list_item_tmdb_id_movie_list_id_pk",
-          "columns": [
-            "tmdb_id",
-            "movie_list_id"
-          ]
+          "columns": ["tmdb_id", "movie_list_id"]
         }
       },
       "uniqueConstraints": {},
@@ -340,9 +309,7 @@
         "user_id_unique": {
           "name": "user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "policies": {},

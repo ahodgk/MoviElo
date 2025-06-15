@@ -1,4 +1,4 @@
-import type { movieList, movieListItem } from "@repo/database";
+import type { movieList } from "@repo/database";
 import {
   queryOptions,
   useMutation,
@@ -12,7 +12,7 @@ import {
   getListItemsFn,
   getLists,
 } from "~/lib/functions/lists/get";
-import { addListItemFn, resetEloFn } from "../functions/lists/edit";
+import { addListItemFn, editListFn, resetEloFn } from "../functions/lists/edit";
 import { createListFn } from "../functions/lists/new";
 
 export const getListsQueryOptions = () =>
@@ -27,13 +27,15 @@ export const getListDetailsQueryOptions = (listId: string) =>
     queryFn: async () => await getListDetails({ data: { listId } }),
   });
 
+type TGetListDetails = any; //Awaited<ReturnType<Required<ReturnType<typeof getListDetailsQueryOptions>>['queryFn']>>;
+
 type MovieList = typeof movieList.$inferSelect;
 export const useCreateListMutation = () => {
   const queryClient = useQueryClient();
   const createList = useServerFn(createListFn);
   return useMutation({
     mutationFn: createList,
-    onMutate: async (newList) => {
+    onMutate: async () => {
       toast.loading("Creating list...", { id: "create-list" });
     },
     onSuccess: (data) => {
@@ -52,9 +54,6 @@ export const useCreateListMutation = () => {
     },
   });
 };
-type MovieListWithItems = MovieList & {
-  items: (typeof movieListItem.$inferSelect)[];
-};
 
 export const getListItemsQueryOptions = (listId: string) =>
   queryOptions({
@@ -71,14 +70,14 @@ export const useAddItemToListMutation = () => {
     onMutate: async ({ data }) => {
       toast.loading("Adding item to list...", { id: "add-list-item" });
       await queryClient.cancelQueries({ queryKey: ["list", data.listId] });
-      const previousList = queryClient.getQueryData<MovieList>([
+      const previousList = queryClient.getQueryData<TGetListDetails>([
         "list",
         data.listId,
       ]);
 
       queryClient.setQueryData(
         ["list", data.listId],
-        (oldList: MovieListWithItems) => {
+        (oldList: TGetListDetails) => {
           return {
             ...oldList,
             items: [...(oldList.items || []), data],
@@ -88,7 +87,7 @@ export const useAddItemToListMutation = () => {
 
       return { previousList };
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: () => {
       toast.success("Item added to list successfully!", {
         id: "add-list-item",
       });
@@ -104,7 +103,7 @@ export const useAddItemToListMutation = () => {
         );
       }
     },
-    onSettled: (data, error, variables) => {
+    onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["list", variables.data.listId],
       });
@@ -122,17 +121,17 @@ export const useResetListMutation = () => {
       toast.loading("Resetting list elo...", { id: "reset-list-elo" });
       await queryClient.cancelQueries({ queryKey: ["list", data.listId] });
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: () => {
       toast.success("List elo reset successfully!", {
         id: "reset-list-elo",
       });
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
       toast.error(`Failed to reset list elo: ${error.message}`, {
         id: "reset-list-elo",
       });
     },
-    onSettled: (data, error, variables) => {
+    onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["list", variables.data.listId],
       });
@@ -145,3 +144,55 @@ export const getListComparisonHistoryQueryOptions = (listId: string) =>
     queryKey: ["list", listId, "history"],
     queryFn: () => getComparisonHistoryFn({ data: { listId } }),
   });
+
+export const useEditListMutation = () => {
+  const queryClient = useQueryClient();
+  const editList = useServerFn(editListFn);
+
+  return useMutation({
+    mutationFn: editList,
+    onMutate: async ({ data }) => {
+      toast.loading("Editing list...", { id: "edit-list" });
+      await queryClient.cancelQueries({ queryKey: ["list", data.listId] });
+      const previousList = queryClient.getQueryData<TGetListDetails>([
+        "list",
+        data.listId,
+      ]);
+
+      queryClient.setQueryData(
+        ["list", data.listId],
+        (oldList: TGetListDetails) => {
+          return {
+            ...oldList,
+            name: data.name,
+            initialK: data.initialK,
+            tuningFactor: data.tuningFactor,
+          };
+        },
+      );
+
+      return { previousList };
+    },
+    onSuccess: () => {
+      toast.success("List saved successfully!", {
+        id: "edit-list",
+      });
+    },
+    onError: (error, variables, context) => {
+      toast.error(`Failed to edit list: ${error.message}`, {
+        id: "edit-list",
+      });
+      if (context?.previousList) {
+        queryClient.setQueryData(
+          ["list", variables.data.listId],
+          context.previousList,
+        );
+      }
+    },
+    onSettled: (_data, _error, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["list", variables.data.listId],
+      });
+    },
+  });
+};

@@ -42,7 +42,10 @@ export const getListDetails = createServerFn()
       },
     });
     // logger.debug(list, `Fetched list details, ${list?.id}`);
-    return { list };
+    if (!list) {
+      throw new Error("List not found or access denied");
+    }
+    return list;
   });
 
 export const getListItemsFn = createServerFn()

@@ -35,7 +35,7 @@ export const useSignupMutation = () => {
     onSettled: () => {
       return queryClient.invalidateQueries({ queryKey: ["user"] });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       navigate({ to: "/profile-setup", search: { step: 1 } });
     },
   });
@@ -52,7 +52,7 @@ export const useSignupWithGoogleMutation = () => {
     onSettled: () => {
       return queryClient.invalidateQueries({ queryKey: ["user"] });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       navigate({ to: "/profile-setup", search: { step: 1 } });
     },
   });
@@ -73,7 +73,7 @@ export const useExchangeGoogleCodeMutation = () => {
     onSettled: () => {
       return queryClient.invalidateQueries({ queryKey: ["user"] });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       navigate({ to: "/profile-setup", search: { step: 1 } });
     },
   });
