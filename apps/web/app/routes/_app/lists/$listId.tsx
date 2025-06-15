@@ -97,8 +97,6 @@ function RouteComponent() {
   const { listId } = Route.useParams();
   const { data: listDetails } = useQuery(getListDetailsQueryOptions(listId));
 
-  console.log("listDetails", listDetails);
-
   if (!listDetails) {
     return <div className="p-6">List not found</div>;
   }
@@ -199,15 +197,17 @@ const ViewListDetailsCard = ({
       <CardContent className="flex flex-col gap-4">
         <div>
           <div className="flex flex-row items-center gap-1">
+            K Factor
             <InfoTooltip
               text="The K factor determines how quickly the Elo rating changes. A higher K
         factor means ratings change more quickly."
             />
-            K Factor : {listDetails?.initialK}
+            : {listDetails?.initialK}
           </div>
           <div className="flex flex-row items-center gap-1">
+            Tuning Factor
             <InfoTooltip text="The tuning factor determines how quickly the K factor decreases, based on how many matches an item has had so far" />
-            Tuning Factor: {listDetails?.tuningFactor}
+            : {listDetails?.tuningFactor}
           </div>
         </div>
       </CardContent>
@@ -506,9 +506,9 @@ const HistoryMovieCard = ({
 };
 
 type MovieList = typeof movieList.$inferSelect;
-type MovieListWithItems = MovieList & {
-  items: MovieListItem[];
-};
+// type MovieListWithItems = MovieList & {
+//   items: MovieListItem[];
+// };
 
 const ComparisonSection = ({ listId }: { listId: string }) => {
   const { data: listItems } = useSuspenseQuery(
@@ -622,8 +622,6 @@ const MovieHeadToHeadCard = ({
   tmdbId: string;
   onClick: () => void;
 }) => {
-  console.log("tmdbId", tmdbId);
-
   const { data } = useQuery(getMovieDetailsQueryOptions(tmdbId));
   return (
     <Button
