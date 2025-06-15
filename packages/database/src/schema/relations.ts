@@ -6,7 +6,7 @@ import {
   userProfile,
 } from "./schema";
 
-export const userRelations = relations(userProfile, ({  many }) => ({
+export const userRelations = relations(userProfile, ({ many }) => ({
   lists: many(movieList),
   // items: many(movieListItem),
 }));
