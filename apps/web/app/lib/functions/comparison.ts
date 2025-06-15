@@ -125,7 +125,6 @@ const updateElo = (tmdbId: string, listId: string, elo: number) => {
     );
 };
 
-
 const getItemEloData = (listId: string, itemId: string) =>
   db
     .select({

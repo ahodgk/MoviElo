@@ -31,7 +31,6 @@ export const getListDetails = createServerFn()
   .middleware([protectMiddleware])
   .validator(z.object({ listId: z.string() }))
   .handler(async ({ context, data }) => {
-
     const historyCountPromise = db
       .select({
         count: count(movieListComparisonHistory.id),
@@ -53,7 +52,7 @@ export const getListDetails = createServerFn()
     if (!list) {
       throw new Error("List not found or access denied");
     }
-    return {...list, historyCount: (await historyCountPromise)[0].count};
+    return { ...list, historyCount: (await historyCountPromise)[0].count };
   });
 
 export const getListItemsFn = createServerFn()

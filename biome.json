@@ -42,6 +42,7 @@
           }
         }
       },
+
       "style": {
         "useLiteralEnumMembers": "error",
 

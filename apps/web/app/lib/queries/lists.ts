@@ -27,7 +27,7 @@ export const getListDetailsQueryOptions = (listId: string) =>
     queryFn: async () => await getListDetails({ data: { listId } }),
   });
 
-export type TGetListDetails = Awaited<ReturnType<typeof getListDetails>>// any; //Awaited<ReturnType<Required<ReturnType<typeof getListDetailsQueryOptions>>['queryFn']>>;
+export type TGetListDetails = Awaited<ReturnType<typeof getListDetails>>; // any; //Awaited<ReturnType<Required<ReturnType<typeof getListDetailsQueryOptions>>['queryFn']>>;
 
 type MovieList = typeof movieList.$inferSelect;
 export const useCreateListMutation = () => {

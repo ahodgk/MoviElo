@@ -14,7 +14,7 @@
 		"start": "turbo run start",
 		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
 		"lint": "biome check --fix",
-		"ci-lint": "biome check",
+		"ci-lint": "biome lint",
 		"fix": "biome lint --fix ",
 		"test": "turbo run test",
 		"db:migrate:dev": "(cd packages/database; yarn generate; yarn migrate)"
