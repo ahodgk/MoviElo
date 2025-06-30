@@ -20,7 +20,7 @@
 		"db:migrate:dev": "(cd packages/database; yarn generate; yarn migrate)"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.0.0-beta.6",
+		"@biomejs/biome": "^2.0.6",
 		"rimraf": "^6.0.1",
 		"turbo": "latest"
 	},
