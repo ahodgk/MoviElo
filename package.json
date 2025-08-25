@@ -20,7 +20,7 @@
 		"db:migrate:dev": "(cd packages/database; yarn generate; yarn migrate)"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.0.0-beta.6",
+		"@biomejs/biome": "^2.2.2",
 		"rimraf": "^6.0.1",
 		"turbo": "latest"
 	},
@@ -30,6 +30,6 @@
 	},
 	"packageManager": "yarn@4.8.1",
 	"dependencies": {
-		"@tanstack/react-pacer": "^0.8.0"
+		"@tanstack/react-pacer": "^0.16.0"
 	}
 }
