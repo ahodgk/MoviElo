@@ -41,19 +41,19 @@
   "dependencies": {
     "buffer": "^6.0.3",
     "dotenv": "^16.4.7",
-    "drizzle-orm": "^0.41.0",
-    "drizzle-zod": "^0.7.0",
-    "postgres": "^3.4.5"
+    "drizzle-orm": "^0.44.7",
+    "drizzle-zod": "^0.8.3",
+    "postgres": "^3.4.7"
   },
   "devDependencies": {
     "@repo/typescript-config": "*",
     "@types/node": "^20.11.24",
-    "drizzle-kit": "^0.30.5",
+    "drizzle-kit": "^0.31.7",
     "eslint": "^8.57.0",
-    "prettier": "^3.3.3",
+    "prettier": "^3.6.2",
     "rimraf": "^5.0.5",
-    "tsx": "^4.7.1",
-    "typescript": "^5.3.3",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
     "vitest": "^3.0.9",
     "zod": "^3.24.2"
   }
